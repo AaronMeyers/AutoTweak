@@ -50,6 +50,11 @@ namespace AutoTweak {
 			item.rectTransform.SetParent( dropDownScrollContent, false );
 			item.label.text = label;
 			
+			if ( dropDownScrollContent.childCount > 1 ) {
+				// only need to drop down if more than one thing is added
+				dropDownButton.enabled = true;
+			}
+			
 			return item.button;
 		}
 	

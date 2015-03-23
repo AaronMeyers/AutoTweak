@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEditor;
+using UnityEngine.EventSystems;
 
 namespace AutoTweak {
 
@@ -38,9 +39,9 @@ namespace AutoTweak {
 		Dictionary<object, TweakPanel> tweakPanels;
 		
 		void Awake() {
+			
+		
 			canvas = GetComponent<Canvas>();
-//			rootPanel = canvas.transform.GetChild( 0 ) as RectTransform;
-//			tweakPanelHolder = rootPanel.GetChild( 0 ) as RectTransform;
 			
 			dropDownSelector = (Instantiate( dropDownPrefab ) as GameObject).GetComponent<DropDown>();
 			dropDownSelector.GetComponent<RectTransform>().SetParent( rootPanel, false );
@@ -51,6 +52,12 @@ namespace AutoTweak {
 			showButton.onClick.AddListener( ShowPanel );
 			
 			tweakPanels = new Dictionary<object, TweakPanel>();
+			
+			if ( EventSystem.current == null ) {
+				canvas.gameObject.AddComponent<EventSystem>();
+				canvas.gameObject.AddComponent<TouchInputModule>();
+				canvas.gameObject.AddComponent<StandaloneInputModule>();
+			}
 		}
 	
 		public static void RegisterTweakableObject( object tweakee ) {
@@ -70,8 +77,10 @@ namespace AutoTweak {
 			// make a panel
 			SetupTweakPanel( tweakee );
 			
-			// make it active
-			SetActivePanel( tweakee );
+			if ( tweakPanels.Count == 1 ) {
+				// make it active
+				SetActivePanel( tweakee );
+			}
 		}
 		
 		void SetupTweakPanel( object target ) {
@@ -97,10 +106,7 @@ namespace AutoTweak {
 					slider.SetTarget( target, fi );
 				}
 				
-			}
-			
-			panel.ResizeContent();
-			
+			}	
 			tweakPanels.Add( target, panel );
 		}
 		
@@ -113,6 +119,7 @@ namespace AutoTweak {
 				kvp.Value.gameObject.SetActive( kvp.Key == target ? true : false );
 			}
 			tweakPanelHolder.gameObject.SetActive( true );
+			tweakPanels[target].ResizeContent();
 		}
 		
 		void HidePanel() {
