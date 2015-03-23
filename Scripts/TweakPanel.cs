@@ -25,7 +25,20 @@ namespace AutoTweak
 				rectTransform.GetComponent<ScrollRect>().vertical = false;
 			}
 			
+			if ( maxHeight == 0.0f ) {
+				// weird hack because sometimes maxHeight is 0 because of something with the order of Layout scripts?
+				StartCoroutine( RetryResize() );
+			}
 		}
+		
+		IEnumerator RetryResize() {
+			
+			yield return new WaitForSeconds( .01f );
+			
+			ResizeContent();
+			
+		}
+		
 	}
 
 }
